@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Simple WebSocket</title>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script type="text/javascript">
+  
+    var colors = [
+      "#00FF00",
+      "#00FFFF",
+      "#FFFF00",
+      "#006600",
+      "#0066FF",
+      "#003300",
+      "#0033FF",
+      "#000000",
+      "#FF6600",
+      "#FF66FF",
+      "#FF3300"
+    ];
+    
+    function color( index ){
+      return colors[ (index - 1) % colors.length ];
+    }
+    
+    function debug( string ) {
+      console.log( string );
+    };
+
+    function message( message ){
+      var json = jQuery.parseJSON( message );
+      
+      switch( json.type ){
+        case "message":
+          $("#scene").append( "<span style='color: " + color( json.id ) + "'>" + json.char + "</span>" );
+          break;
+        case "hello":
+          break;
+        case "goodbye":
+          removeActor( json.id );
+          break;
+        case "actor":
+          addActor( json.id );
+          break;
+        case "actors":
+          for( index in json.actors ){
+            addActor( json.actors[index] );
+          }
+          break;
+        default:
+          debug( "message type unknown:" + json.type );
+      }
+
+      
+    }
+    
+    function addActor( id ){
+      $("#actors ul").append( "<li id='actor-" + id + "' style='display:none; background-color: " + color( id ) + "'></li>");
+      $("#actor-" + id).fadeIn( "slow" );
+    }
+    
+    function removeActor( id ){
+      $("#actor-" + id).fadeOut( "slow" );
+    }
+
+    var ws = null;
+    function init() {
+      var Socket = ("MozWebSocket" in window) ? MozWebSocket : WebSocket;
+      ws = new Socket("ws://127.0.0.1:8080/");
+
+      ws.onmessage = function(evt) {
+        debug( "message received:" + evt.data );
+        message( evt.data )
+      };
+
+      ws.onclose = function() {
+        debug("socket closed");
+      };
+
+      ws.onerror = function() {
+        debug("socket error!");
+      };
+
+      ws.onopen = function() {
+        debug("connected...");
+        
+      };
+
+      debug( "init end" );
+    };
+
+    $(function(){
+      init();
+
+      $("body").keypress(
+        function( event ){
+          event.preventDefault();
+
+          var key = String.fromCharCode( event.which );
+
+          debug( "key pressed:" + key );
+
+          if( ws.readyState != 1 ){
+            debug( "socket not ready" );
+            return;
+          }
+
+          ws.send( key );
+        }
+      );
+
+    });
+
+
+  </script>
+  
+  <style type="text/css">
+    #actors ul {
+      margin: 0;
+      padding: 0;
+    }
+    #actors ul li{
+      width: 20px;
+      height: 20px;
+      margin: 2px;
+      display: inline-block;
+      list-style: none;
+    }
+    
+  </style>
+</head>
+<body>
+  <div id="conainer">
+    <header>
+      <h1>Animal Chat</h1>
+      <p>Just type</p>
+    </header>
+
+    <div id="actors">
+      <ul></ul>
+    </div>
+    
+    <div id="scene">
+    </div>
+
+    <footer>
+      <p>
+        Just another open-source experiment by
+        <a href="http://fernandoguillen.info">Fernando Guillen</a>.
+      </p>
+      <p>
+        Fork me at github.
+      </p>
+    </footer>
+  </div>
+</body>
+</html>
