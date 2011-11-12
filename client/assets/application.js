@@ -146,7 +146,7 @@ $(function(){
   showConnecting();
   connect();
 
-  $("body").keypress(
+  $(document).keypress(
     function( event ){
       event.preventDefault();
 
