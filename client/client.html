@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Simple WebSocket</title>
+  <link rel="stylesheet" type="text/css" href="./assets/reset.css" />
+  <link rel="stylesheet" type="text/css" href="./assets/style.css" />
+  <link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Monofett' rel='stylesheet' type='text/css'>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script type="text/javascript" src="./assets/application.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div id="left-column" class="column">
+      <header>
+        <h1>Animal Chat</h1>
+        <p>Just type</p>
+      </header>
+
+      <div id="actors">
+        <ul></ul>
+      </div>
+      
+      <footer>
+        <p>
+          Just another 
+          <a href="https://github.com/fguillen/AnimalChat">open-source</a>
+          experiment by
+          <a href="http://fernandoguillen.info">Fernando Guillen</a>.
+        </p>
+      </footer>      
+    </div>
+
+    <div id="right-column" class="column">
+      <div id="scene"></div>
+    </div>
+
+    <div id="light-box">
+      <div id="connecting-problem" class="message">
+        Connection problem <br />
+        <a id="retry-connection">Retry</a>
+        <div class="spinner">
+          <img src="./assets/spinner.gif" />
+        </div>
+      </div>
+      
+      <div id="connecting" class="message">
+        Connecting
+        <div class="spinner">
+          <img src="./assets/spinner.gif" />
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
