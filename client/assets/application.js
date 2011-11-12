@@ -27,15 +27,21 @@ function actorWriting( json ){
   $("#scene").append( "<span style='color: " + color( json.id ) + "'>" + json.char + "</span>" );
   
   $('#actor-' + json.id).stop(true);
-  
-  
+
   $('#actor-' + json.id).animate({
-    width: ($('#actor-' + json.id).width() + 5) + "px",
-    height: ($('#actor-' + json.id).height() + 5) + "px"
+    scale: '2'
   }, 200).animate({
-    width: normalSize + "px",
-    height: normalSize + "px"
+    scale: '1'
   }, 100);
+  
+  
+  // $('#actor-' + json.id).animate({
+  //   width: ($('#actor-' + json.id).width() + 5) + "px",
+  //   height: ($('#actor-' + json.id).height() + 5) + "px"
+  // }, 200).animate({
+  //   width: normalSize + "px",
+  //   height: normalSize + "px"
+  // }, 100);
 }
 
 function message( message ){
@@ -107,8 +113,8 @@ function hideLightBox(){
 
 var ws = null;
 function connect() {
-  // var address = "127.0.0.1";
-  var address = "ilefante3.fernandoguillen.info";
+  var address = "127.0.0.1";
+  // var address = "ilefante3.fernandoguillen.info";
   
   var Socket = ("MozWebSocket" in window) ? MozWebSocket : WebSocket;
   ws = new Socket("ws://" + address + ":8080/");
