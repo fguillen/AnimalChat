@@ -113,8 +113,8 @@ function hideLightBox(){
 
 var ws = null;
 function connect() {
-  var address = "127.0.0.1";
-  // var address = "ilefante3.fernandoguillen.info";
+  // var address = "127.0.0.1";
+  var address = "animalchat.fernandoguillen.info";
   
   var Socket = ("MozWebSocket" in window) ? MozWebSocket : WebSocket;
   ws = new Socket("ws://" + address + ":8080/");
