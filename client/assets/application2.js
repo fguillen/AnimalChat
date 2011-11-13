@@ -1,11 +1,16 @@
 $(function(){
   var Radio = Backbone.Model.extend({
-    broadcast: function( key ){
-      console.log( "broadcast: ", key );
+    initialize: function( options ){
+      this.address = options.address;
+    },
+    
+    broadcast: function( message ){
+      console.log( "broadcast: ", message );
+      this.socket.send( JSON.stringify( message ) );
     },
 
     connect: function(){
-      console.log( "connecting" );
+      console.log( "connecting to: ", this.address );
       
       _self = this;
       this.trigger( "connecting" );
@@ -13,9 +18,9 @@ $(function(){
       var Socket = ("MozWebSocket" in window) ? MozWebSocket : WebSocket;
       this.socket = new Socket("ws://" + this.address + ":8080/");
 
-      this.socket.onmessage = function( evt ) {
-        console.log( "message received:" + evt.data );
-        this.messageReceived( evt.data )
+      this.socket.onmessage = function( message ) {
+        console.log( "message received: " + message );
+        _self.trigger( "messageReceived", message.data );
       };
 
       this.socket.onclose = function() {
@@ -32,18 +37,16 @@ $(function(){
       this.socket.onopen = function() {
         console.log("connected...");
         // hideLightBox();
+        _self.trigger( "connected" );
       };
-    },
-
-    messageReceived: function( message ){
-      console.log( "mesage received: ", mesage );
     }
+    
   });
 
   var AppView = Backbone.View.extend({
     defaults: {
       // "address": "127.0.0.1",
-      "address": "animalchat.fernandoguillen.info";
+      "address": "animalchat.fernandoguillen.info"
       
     },
     
@@ -51,22 +54,54 @@ $(function(){
     
 
     initialize: function( options ){
-      this.me       = new Actor();
+      console.log( "initialize AppView" );
+      console.log( "AppView.address: ", options.address );
+      
+      this.address  = options.address;
+      
+      var meId    = Math.floor(Math.random() * 1000) + "" + (new Date()).getTime();
+      var meColor = AppView.colors[ (meId - 1) % AppView.colors.length ]
+      
+      this.me       = new Actor({ id: meId , color: meColor });
       this.actors   = new Actors();
       this.scene    = new MessagesView();
-      this.alert    = new Alert({ status: 'pepe' });
+      this.alert    = new Alert();
       
       console.log( "alert.status: ", this.alert.get('status') );
       
-      this.radio    = new Radio();
+      this.radio    = new Radio({ address: this.address });
       
       this.alertView = new AlertView({ model: this.alert });
       this.alertView.render();
       
       this.radio.bind( "connectionError" , this.alert.error      , this.alert );
       this.radio.bind( "connecting"      , this.alert.connecting , this.alert );
+      this.radio.bind( "connected"       , this.sayHello         , this );
+      this.radio.bind( "messageReceived" , this.messageReceived  , this );
       
       this.radio.connect();
+      
+      this.actors.bind( 'add', this.addActor, this );
+      this.actors.add( this.me );
+    },
+    
+    messageReceived: function( data ){
+      console.log( "messageReceived: ", data );
+    },
+    
+    sayHello: function(){
+      console.log( "sayHello" );
+      
+      this.radio.broadcast({
+        type: "hello",
+        actor: this.me.toJSON()
+      })
+    },
+    
+    addActor: function( actor ){
+      console.log( "addActor: ", actor );
+      var view = new ActorView({ model: actor });
+      $("#actors ul").append( view.render() );
     },
 
     events: {
@@ -79,10 +114,27 @@ $(function(){
     }
 
 
+  }, {
+    colors: [
+      "#00FF00",
+      "#00FFFF",
+      "#FFFF00",
+      "#006600",
+      "#0066FF",
+      "#003300",
+      "#0033FF",
+      "#000000",
+      "#FF6600",
+      "#FF66FF",
+      "#FF3300"
+    ], 
   });
 
 
   var Alert = Backbone.Model.extend({
+    initialize: function( options ){
+    },
+    
     defaults: {
       "status": "hidden",
     },
@@ -113,15 +165,16 @@ $(function(){
   });
 
   var AlertView = Backbone.View.extend({
-    initialize: function(){
+    initialize: function( options ){
       console.log( "initalizing AlertView" );
+      this.model = options.model;
       this.model.bind( "change", this.render, this );
-      console.log( "initalizing AlertView, model.status: ", this.model );
+      console.log( "initalizing AlertView, model.status: ", this.model.get( 'status' ) );
     },
     
     render: function(){
-      console.log( "rendering alert: ", this.model );
-      switch( this.model.status ){
+      console.log( "rendering alert: ", this.model.get( 'status' ) );
+      switch( this.model.get( 'status' ) ){
         case "hidden":
           console.log( "alert status hidden" );
           break;
@@ -132,7 +185,7 @@ $(function(){
           console.log( "alert status connecting" );
           break;
         default:
-          console.error( "alert status not found: ", this.model.status );
+          console.error( "alert status not found: ", this.model.get( 'status' ) );
       }
     }
   });
@@ -144,20 +197,21 @@ $(function(){
     initialize: function( data ){
       this.id     = data.id;
       this.color  = data.color;
-    },
-
-    messageReceived: function( key ){}
+    }
   });
 
   var Actors = Backbone.Collection.extend({
     model: Actor
-  })
+  });
 
   var ActorView = Backbone.View.extend({
-    tagName:  "li",
-    model:    Actor,
+    template: _.template( "<li id='actor-<%= id %>' style='background-color: <%= color %>'>xx</li>" ),
     bump:     function(){},
-    unbump:   function(){}
+    unbump:   function(){},
+    render:   function(){
+      console.log( "rendering ActorView: ", this.model.toJSON() );
+      return this.template( this.model.toJSON() );
+    }
   });
 
   var ActorsView = Backbone.View.extend({
@@ -181,5 +235,5 @@ $(function(){
   });
 
 
-  window.App = new AppView();
+  window.App = new AppView({ address: '127.0.0.1' });
 });
