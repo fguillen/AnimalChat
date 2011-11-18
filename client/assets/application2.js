@@ -1,9 +1,18 @@
-$(function(){
-  var Radio = Backbone.Model.extend({
-    initialize: function( options ){
-      this.address = options.address;
-    },
+var AppView;
+var Radio;
+var AlertView;
+var BrowserSocket = ("MozWebSocket" in window) ? MozWebSocket : WebSocket;
 
+$(function(){
+  Radio = Backbone.Model.extend({
+    defaults: {
+      "address": "127.0.0.1",
+    },
+    
+    initialize: function(){
+      console.log( "Radio initialize address: ", this.get( "address" ) );
+    },
+    
     broadcast: function( message ){
       console.log( "broadcast: ", message );
       this.socket.send( JSON.stringify( message ) );
@@ -11,12 +20,10 @@ $(function(){
 
     connect: function(){
       console.log( "connecting to: ", this.address );
-
       var _self = this;
       this.trigger( "connecting" );
 
-      var Socket = ("MozWebSocket" in window) ? MozWebSocket : WebSocket;
-      this.socket = new Socket("ws://" + this.address + ":8080/");
+      this.socket = new BrowserSocket("ws://" + this.get("address") + ":8080/");
 
       this.socket.onmessage = function( message ) {
         console.log( "message received: " + message );
@@ -26,68 +33,60 @@ $(function(){
       this.socket.onclose = function() {
         console.log("socket closed");
         _self.trigger( "connectionError" );
-        // connectionError( this.socket );
       };
 
       this.socket.onerror = function() {
         console.log("socket error!");
-        // connectionError( ws );
       };
 
       this.socket.onopen = function() {
         console.log("connected...");
-        // hideLightBox();
         _self.trigger( "connected" );
       };
     }
 
   });
 
-  var AppView = Backbone.View.extend({
+  AppView = Backbone.View.extend({
     defaults: {
-      // "address": "127.0.0.1",
-      "address": "animalchat.fernandoguillen.info"
-
+      "address": "127.0.0.1",
     },
 
     el: "body",
-
+    
+    events: {
+      "keypress":                 "sendKey",
+      "click #retry-connection":  "connect",
+    },
 
     initialize: function( options ){
-      console.log( "initialize AppView" );
-      console.log( "AppView.address: ", options.address );
-
-      this.address  = options.address;
-
-      this.actors   = new Actors();
-      this.alert    = new Alert();
-      this.me       = null;
-
-      console.log( "alert.status: ", this.alert.get('status') );
-
-      this.radio    = new Radio({ address: this.address });
-
-      this.alertView = new AlertView({ model: this.alert });
-      this.alertView.render();
-
-      this.actorsView = new ActorsView({ collection: this.actors });
+      this.address     = options.address;
       
-      this.keys = new Keys();
-      this.keysView = new KeysView({ collection: this.keys });
-
+      console.log( "AlertView initialize address: ", this.address );
+      
+      this.radio      = new Radio({ address: this.address });
+      this.alert      = new Alert();
+      this.alertView  = new AlertView({ model: this.alert });
+      this.actors     = new Actors();
+      this.actorsView = new ActorsView({ collection: this.actors });
+      this.keys       = new Keys();
+      this.keysView   = new KeysView({ collection: this.keys });
+      
+      this.me         = null;
+      
+      // events
       this.radio.bind( "connectionError" , this.alert.error      , this.alert );
       this.radio.bind( "connecting"      , this.alert.connecting , this.alert );
       this.radio.bind( "connected"       , this.alert.connected  , this.alert );
       this.radio.bind( "messageReceived" , this.messageReceived  , this );
-
+      
+      // show alert
+      this.alertView.render();
+    },
+    
+    connect: function(){
+      console.log( "ActorsView.connect" );
       this.radio.connect();
-
-
-
-      var _self = this;
-      $("#retry-connection").click( function(){
-        _self.radio.connect();
-      });
     },
 
     messageReceived: function( data ){
@@ -100,51 +99,35 @@ $(function(){
           console.log( "message hello received" );
           this.me = new Actor( data.actor );
           this.actors.add( this.me );
-
           break;
           
         case "actor":
           console.log( "message actor received" );
           var actor = new Actor( data.actor );
           this.actors.add( actor );
-
           break;
 
         case "actors":
           console.log( "message actors received" );
           var _self = this;
-
           this.actors.reset( data.actors );
-          // for( index in data.actors ){
-          //   actor_json = data.actors[ index ];
-          //   console.log( "adding actor_json: ", actor_json );
-          //   actor = new Actor( actor_json );
-          //   console.log( "adding actor: ", actor );
-          //   _self.actors.add( actor );
-          // }
-
           break;
           
         case "goodbye":
           console.log( "message goodbye received" );
           var actor = new Actor( data.actor );
           this.actors.remove( actor );
-
           break;
 
         case "key":
           console.log( "message key received" );
           var key = new Key({ color: data.actor.color, key: data.key });
           this.keys.add( key );
-          
           break;
+          
         default:
           console.error( "message type unknown: " + data.type );
       }
-    },
-
-    events: {
-      "keypress": "sendKey"
     },
 
     sendKey: function( event ){
@@ -195,7 +178,7 @@ $(function(){
     }
   });
 
-  var AlertView = Backbone.View.extend({
+  AlertView = Backbone.View.extend({
     initialize: function( options ){
       console.log( "initalizing AlertView" );
       this.model = options.model;
@@ -348,5 +331,6 @@ $(function(){
   });
 
 
-  window.App = new AppView({ address: '127.0.0.1' });
+  // window.App = new AppView({ address: '127.0.0.1' }); #animalchat.fernandoguillen.info
+  // window.App.connect();
 });
