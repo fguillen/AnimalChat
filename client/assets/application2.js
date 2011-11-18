@@ -1,6 +1,7 @@
 var AppView;
 var Radio;
 var AlertView;
+var Actor;
 var BrowserSocket = ("MozWebSocket" in window) ? MozWebSocket : WebSocket;
 
 $(function(){
@@ -8,11 +9,11 @@ $(function(){
     defaults: {
       "address": "127.0.0.1",
     },
-    
+
     initialize: function(){
       console.log( "Radio initialize address: ", this.get( "address" ) );
     },
-    
+
     broadcast: function( message ){
       console.log( "broadcast: ", message );
       this.socket.send( JSON.stringify( message ) );
@@ -48,22 +49,16 @@ $(function(){
   });
 
   AppView = Backbone.View.extend({
-    defaults: {
-      "address": "127.0.0.1",
-    },
-
     el: "body",
-    
+
     events: {
       "keypress":                 "sendKey",
       "click #retry-connection":  "connect",
     },
 
     initialize: function( options ){
-      this.address     = options.address;
-      
-      console.log( "AlertView initialize address: ", this.address );
-      
+      this.address     = options.address || "127.0.0.1";
+
       this.radio      = new Radio({ address: this.address });
       this.alert      = new Alert();
       this.alertView  = new AlertView({ model: this.alert });
@@ -71,60 +66,51 @@ $(function(){
       this.actorsView = new ActorsView({ collection: this.actors });
       this.keys       = new Keys();
       this.keysView   = new KeysView({ collection: this.keys });
-      
-      this.me         = null;
-      
+
+      this.me         = null; // initialized in the 'hello' message
+
       // events
       this.radio.bind( "connectionError" , this.alert.error      , this.alert );
       this.radio.bind( "connecting"      , this.alert.connecting , this.alert );
       this.radio.bind( "connected"       , this.alert.connected  , this.alert );
       this.radio.bind( "messageReceived" , this.messageReceived  , this );
-      
+
       // show alert
       this.alertView.render();
     },
-    
+
     connect: function(){
-      console.log( "ActorsView.connect" );
       this.radio.connect();
     },
 
     messageReceived: function( data ){
       var data = jQuery.parseJSON( data );
-      console.log( "messageReceived: ", data );
-      console.log( "messageReceived type: ", data.type );
 
       switch( data.type ){
         case "hello":
-          console.log( "message hello received" );
+          console.log( "messageReceived hello" );
           this.me = new Actor( data.actor );
           this.actors.add( this.me );
           break;
-          
+
         case "actor":
-          console.log( "message actor received" );
           var actor = new Actor( data.actor );
           this.actors.add( actor );
           break;
 
         case "actors":
-          console.log( "message actors received" );
-          var _self = this;
           this.actors.reset( data.actors );
           break;
-          
+
         case "goodbye":
-          console.log( "message goodbye received" );
-          var actor = new Actor( data.actor );
-          this.actors.remove( actor );
+          this.actors.remove( data.actor.id );
           break;
 
         case "key":
-          console.log( "message key received" );
           var key = new Key({ color: data.actor.color, key: data.key });
           this.keys.add( key );
           break;
-          
+
         default:
           console.error( "message type unknown: " + data.type );
       }
@@ -140,50 +126,33 @@ $(function(){
 
 
   var Alert = Backbone.Model.extend({
-    initialize: function( options ){
-    },
-
     defaults: {
       "status": "hidden",
     },
 
     error: function(){
-      console.log( "alert to error" );
-      console.log( "this.get('status'): ", this.get('status') );
       this.set({ status: "error" });
-      console.log( "this.get('status'): ", this.get('status') );
     },
 
     connecting: function(){
-      console.log( "alert to connecting" );
       this.set({ status: "connecting" });
     },
 
     connected: function(){
-      console.log( "alert to connected" );
       this.set({ status: "connected" });
       this.set({ status: "hidden" });
     },
 
     hidden: function(){
-      console.log( "alert to hidden" );
       this.set({ status: "hidden" });
     },
 
-    initialize: function(){
-      console.log( "Alert initialize" );
-      console.log( "Alert status: " + this.get('status') );
-
-
-    }
   });
 
   AlertView = Backbone.View.extend({
     initialize: function( options ){
-      console.log( "initalizing AlertView" );
       this.model = options.model;
       this.model.bind( "change", this.render, this );
-      console.log( "initalizing AlertView, model.status: ", this.model.get( 'status' ) );
     },
 
     render: function(){
@@ -220,7 +189,7 @@ $(function(){
     }
   });
 
-  var Actor = Backbone.Model.extend({
+  Actor = Backbone.Model.extend({
     defaults: {
     },
 
@@ -255,7 +224,7 @@ $(function(){
       var view = new ActorView({ model: actor });
       $(this.el).append( view.render() );
     },
-    
+
     removeActor: function( actor ){
       console.log( "removeActor: ", actor );
       $(this.el).find("li#actor-" + actor.id ).fadeOut('slow');
@@ -268,7 +237,7 @@ $(function(){
       this.collection.each( function( actor ){
         console.log( "creating new ActorView: ", actor );
         var view = new ActorView({ model: actor });
-        console.log( "this: ", _self );  
+        console.log( "this: ", _self );
         console.log( "el: ", $(_self.el) );
         $(_self.el).append( view.render() );
       });
@@ -313,13 +282,13 @@ $(function(){
 
   var KeysView = Backbone.View.extend({
     el: "#scene",
-    
+
     initialize: function(){
       console.log( "KeysView initialize" );
-      
+
       this.collection.bind( "add", this.addKey, this );
     },
-    
+
     addKey: function( key ){
       console.log( "addKey: ", key );
       console.log( "addKey escaped: ", escape( key.key ) );
