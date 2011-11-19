@@ -8,9 +8,23 @@
   <link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
   <link href='http://fonts.googleapis.com/css?family=Monofett' rel='stylesheet' type='text/css'>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script type="text/javascript" src="./assets/jquery.transform2d.js"></script>
   <script type="text/javascript" src="./assets/underscore-min.js"></script>
   <script type="text/javascript" src="./assets/backbone.js"></script>
-  <script type="text/javascript" src="./assets/application2.js"></script>
+  <script type="text/javascript" src="./assets/utils.js"></script>
+  <script type="text/javascript" src="./assets/animal_chat.js"></script>
+  <script type="text/javascript">
+    $(function(){
+      window.App = new AnimalChat.AppView({ address: "127.0.0.1" }); // animalchat.fernandoguillen.info
+      window.App.connect();
+    });
+  </script>
+  <style>
+  #scene li{
+    display: inline-block;
+
+  }
+  </style>
 </head>
 <body>
   <div id="container">
@@ -21,7 +35,6 @@
       </header>
 
       <div id="actors">
-        <ul></ul>
       </div>
       
       <footer>
@@ -35,7 +48,7 @@
     </div>
 
     <div id="right-column" class="column">
-      <div id="scene"></div>
+      <div id="scene"><ul /></div>
     </div>
 
     <div id="light-box">
