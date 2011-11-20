@@ -1,6 +1,20 @@
 var BrowserSocket = ("MozWebSocket" in window) ? MozWebSocket : WebSocket;
 var AnimalChat = {};
 
+
+function clean( string ) {
+  result =
+    string
+      .replace(/&/g, "&amp;")
+      .replace(/>/g, "&gt;")
+      .replace(/</g, "&lt;")
+      .replace(/"/g, "&quot;")
+      .replace(/"/g, "&quot;")
+      .replace(/\s/g, "&nbsp;");
+  
+  return result;
+}
+
 $(function(){
   AnimalChat.Radio = Backbone.Model.extend({
     defaults: {
@@ -219,11 +233,11 @@ $(function(){
     removeActor: function( actor ){
       $(this.el).find("div#actor-" + actor.get( "id" ) ).stop( true ).fadeOut( 600, function(){
         $(this).remove();
-        console.log( "removed" );
       });
     },
 
     render: function(){
+      $(this.el).empty();
       this.collection.each( $.proxy( this.addActor, this ) );
     }
   });

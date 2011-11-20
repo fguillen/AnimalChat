@@ -232,9 +232,9 @@ describe( "AnimalChat.AppView", function() {
 
 describe( "AnimalChat.Alert", function() {
   beforeEach( function(){
-    this.alert = new AnimalChat.Alert(); 
+    this.alert = new AnimalChat.Alert();
   });
-  
+
   it( "initialize", function() {
     expect( this.alert.get( "status" ) ).toEqual( "hidden" );
   });
@@ -401,7 +401,7 @@ describe( "AnimalChat.ActorsView", function() {
     console.log( "pepe" );
     var actors = new AnimalChat.Actors();
     var actorsView = new AnimalChat.ActorsView({ collection: actors });
-    
+
     expect( actorsView.collection ).toEqual( actors );
   });
 
@@ -470,7 +470,7 @@ describe( "AnimalChat.ActorsView", function() {
 
   it( "removeActor", function() {
     var clock = sinon.useFakeTimers();
-    
+
     var actors = new AnimalChat.Actors();
     var actorsView = new AnimalChat.ActorsView({ collection: actors });
     var actor1 = new AnimalChat.Actor({ id: "id1", color: "color1" });
@@ -502,9 +502,13 @@ describe( "AnimalChat.ActorsView", function() {
 
     expect( $(actorsView.el).find("div").length ).toEqual( 0 );
 
+    $(actorsView.el).html( "<div id='delete' />" );
+    expect( $(actorsView.el).find("div#delete").length ).toEqual( 1 );
+
     actorsView.render();
 
     expect( $(actorsView.el).find("div").length ).toEqual( 2 );
+    expect( $(actorsView.el).find("div#delete").length ).toEqual( 0 );
   });
 
 });
@@ -513,14 +517,14 @@ describe( "AnimalChat.ActorView", function(){
   it( "initialize", function(){
     var actor = new AnimalChat.Actor({ id: "id", color: "color" });
     var actorView = new AnimalChat.ActorView({ model: actor });
-    
+
     expect( actorView.model ).toEqual( actor );
   });
-  
+
   it( "render", function(){
     var actor = new AnimalChat.Actor({ id: "id", color: "color" });
     var actorView = new AnimalChat.ActorView({ model: actor });
-    
+
     expect( actorView.render().el )
       .toEqual( "<div id='actor-id' style='background-color: color' />" );
   });
@@ -530,14 +534,14 @@ describe( "AnimalChat.ActorView", function(){
 describe( "AnimalChat.Key", function(){
   it( "initialize defaults", function(){
     var key = new AnimalChat.Key();
-    
+
     expect( key.get( "key" ) ).toEqual( "x" );
     expect( key.get( "color" ) ).toEqual( "none" );
   });
-  
+
   it( "initialize with args", function(){
     var key = new AnimalChat.Key({ key: "a", color: "color" });
-    
+
     expect( key.get( "key" ) ).toEqual( "a" );
     expect( key.get( "color" ) ).toEqual( "color" );
   });
@@ -553,14 +557,14 @@ describe( "AnimalChat.KeysView", function(){
   it( "initialize", function(){
     var key = new AnimalChat.Key();
     var keyView = new AnimalChat.KeyView({ model: key });
-    
+
     expect( keyView.model ).toEqual( key );
   });
-  
+
   it( "render", function(){
     var key = new AnimalChat.Key({ key: "a", color: "color" });
     var keyView = new AnimalChat.KeyView({ model: key });
-    
+
     expect( keyView.render().el ).toEqual( "<li style='color: color'>a</li>" );
   });
 });
@@ -571,43 +575,43 @@ describe( "AnimalChat.KeysView", function(){
     this.sceneDiv.append( $("<ul />") );
     $("body").append( this.sceneDiv );
   });
-  
+
   afterEach( function(){
     this.sceneDiv.remove();
   });
-  
+
   it( "initialize", function(){
     var keys = new AnimalChat.Keys();
     var keysView = new AnimalChat.KeysView({ collection: keys });
-    
+
     expect( keysView.collection ).toEqual( keys );
   });
-  
+
   it( "event when colleciton add", function(){
     var mock =
       sinon
         .mock( AnimalChat.KeysView.prototype )
         .expects( "addKey" )
         .once();
-  
+
     var keys = new AnimalChat.Keys();
     var keysView = new AnimalChat.KeysView({ collection: keys });
-  
+
     keys.add( new AnimalChat.Key() );
-  
+
     mock.verify();
     AnimalChat.KeysView.prototype.addKey.restore();
   });
-  
+
   it( "addKey", function(){
     var keys = new AnimalChat.Keys();
     var keysView = new AnimalChat.KeysView({ collection: keys });
     var key = new AnimalChat.Key({ key: "a", color: "color" });
-    
+
     expect( $(keysView.el).find("li").length ).toEqual( 0 );
-  
+
     keysView.addKey( key );
-  
+
     expect( $(keysView.el).find("li").length ).toEqual( 1 );
   });
 });
