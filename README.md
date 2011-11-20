@@ -10,7 +10,7 @@ The result can't be more satisfactory:
 
 * Very easy and intuitive API based in events
 * Good Ruby support in the server side with [EventMachine WebSocket](https://github.com/igrigorik/em-websocket)
-* Very Good performance, with me very bad Internet connection the response is almost immediate.
+* Very Good performance, with my very poor Internet connection the response is almost immediate.
 
 ## Demo
 

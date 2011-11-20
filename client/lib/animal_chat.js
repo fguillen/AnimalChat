@@ -1,3 +1,10 @@
+//
+// Animal Chat
+// Code: https://github.com/fguillen/AnimalChat
+// Author: Fernando Guillen (http://fernandoguillen.info)
+// License: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
+//
+
 var BrowserSocket = ("MozWebSocket" in window) ? MozWebSocket : WebSocket;
 var AnimalChat = {};
 
