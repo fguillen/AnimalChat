@@ -35,7 +35,7 @@ module AnimalChat
 
     def setup
       @id     = AnimalChat::Actor.create_id
-      @color  = AnimalChat::Actor.get_color( @id )
+      @color  = AnimalChat::Actor.get_color
 
       init_socket
 

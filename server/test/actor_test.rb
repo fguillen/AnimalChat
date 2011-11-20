@@ -67,7 +67,7 @@ class ActorTest < Test::Unit::TestCase
   def test_setup
     AnimalChat::Actor.any_instance.expects(:init_socket).once
     AnimalChat::Actor.expects(:create_id).returns( "id" ).once
-    AnimalChat::Actor.expects(:get_color).with( "id" ).returns( "color" ).once
+    AnimalChat::Actor.expects(:get_color).returns( "color" ).once
 
     actor = AnimalChat::Actor.new( "socket", "channel" )
     actor.setup
