@@ -276,7 +276,7 @@ $(function(){
       var view = new AnimalChat.KeyView({ model: key });
       var element = $(view.render().el);
       element.css({ transform: "scale(1.5)" });
-      element.animate({ transform: 'scale(1)' }, 300 );
+      element.animate({ transform: 'scale(1)' }, 100 );
       $(this.el).append( element );
     }
   });
