@@ -47,17 +47,10 @@ class ActorTest < Test::Unit::TestCase
     assert_equal( [], AnimalChat::Actor.actors )
   end
 
-  def test_colors
-    assert( AnimalChat::Actor.colors.is_a? Array )
-  end
-
   def test_get_color
-    AnimalChat::Actor.stubs(:colors).returns( [1, 2, 3] )
-
-    assert_equal( 1, AnimalChat::Actor.get_color( 0 ) )
-    assert_equal( 3, AnimalChat::Actor.get_color( 2 ) )
-    assert_equal( 1, AnimalChat::Actor.get_color( 3 ) )
-    assert_equal( 2, AnimalChat::Actor.get_color( 160 ) )
+    20.times do
+      assert_match( /#[0-9a-f]{6}/, AnimalChat::Actor.get_color )
+    end
   end
 
   def test_create_id

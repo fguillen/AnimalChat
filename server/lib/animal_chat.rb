@@ -15,30 +15,13 @@ module AnimalChat
 
     @@actors = []
 
-    COLORS = [
-      "#00FF00",
-      "#00FFFF",
-      "#FFFF00",
-      "#006600",
-      "#0066FF",
-      "#003300",
-      "#0033FF",
-      "#000000",
-      "#FF6600",
-      "#FF66FF",
-      "#FF3300"
-    ]
-
-    def self.colors
-      COLORS
-    end
-
     def self.actors
       @@actors
     end
 
-    def self.get_color( index )
-      AnimalChat::Actor.colors[ index % AnimalChat::Actor.colors.size ]
+    def self.get_color
+      # cc -> no too much bright
+      "#%02x%02x%02x" % [(rand * 0xcc), (rand * 0xcc), (rand * 0xcc)]
     end
 
     def self.create_id
