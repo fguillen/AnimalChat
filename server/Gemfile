@@ -1,0 +1,7 @@
+source :rubygems
+
+gem "em-websocket"
+gem "json"
+
+gem "rake", :group => :development
+gem "mocha", :group => :test, :require => false

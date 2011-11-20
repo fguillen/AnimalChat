@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+# Use:
+#     animal_chat_server <address>
+
+require_relative "../lib/animal_chat"
+
+if( ARGV[0].nil? )
+  puts "use: $ animal_chat_server <address>"
+  exit 1
+end
+
+AnimalChat::Server.new( ARGV[0] ).start
