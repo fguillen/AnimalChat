@@ -3,5 +3,11 @@ source :rubygems
 gem "em-websocket"
 gem "json"
 
-gem "rake", :group => :development
-gem "mocha", :group => :test, :require => false
+group :development do
+  gem "rake"
+end
+
+group :test do
+  gem "minitest"
+  gem "mocha"
+end

@@ -29,7 +29,7 @@ end
 class FakeChannel
   def subscribe( &block )
     @subscribe = block
-    
+
     return "sid"
   end
 
@@ -38,7 +38,7 @@ class FakeChannel
   end
 end
 
-class ActorTest < Test::Unit::TestCase
+class ActorTest < Minitest::Test
   def setup
     AnimalChat::Logger.stubs( :log )
   end
@@ -54,7 +54,7 @@ class ActorTest < Test::Unit::TestCase
   end
 
   def test_create_id
-    assert_not_equal( AnimalChat::Actor.create_id, AnimalChat::Actor.create_id )
+    assert( AnimalChat::Actor.create_id != AnimalChat::Actor.create_id )
     assert( AnimalChat::Actor.create_id.is_a? Integer )
   end
 
@@ -141,84 +141,84 @@ class ActorTest < Test::Unit::TestCase
 
   def test_channel_subscribe
     actor = AnimalChat::Actor.new( "socket", "channel" )
-    
+
     fakeChannel = FakeChannel.new
     actor.stubs(:channel).returns( fakeChannel )
 
     actor.channel_subscribe
-    
+
     assert_equal( "sid", actor.sid )
 
     actor.expects(:say).with( "message" )
-    
+
     actor.channel.call_subscribe( "message" )
   end
-  
+
   def test_close_communication
     actor = AnimalChat::Actor.new( "socket", "channel" )
-    
+
     actor.stubs(:sid).returns( "sid" )
     actor.stubs(:to_hash).returns( "to-hash" )
-    
+
     actor.channel.expects(:unsubscribe).with( "sid" ).once
     actor.expects(:publish).with({ :type => "goodbye", :actor => "to-hash" })
-    
+
     AnimalChat::Actor.actors.expects(:delete).with( actor ).once
-    
+
     actor.close_communication
   end
-  
+
   def test_say
     actor = AnimalChat::Actor.new( "socket", "channel" )
     message = { "type" => "test" }
     actor.socket.expects(:send).with( message.to_json ).once
-    
+
     actor.say message
   end
-  
+
   def test_say_hello
     actor = AnimalChat::Actor.new( "socket", "channel" )
     actor.stubs(:to_hash).returns( "to-hash" )
     actor.expects(:say).with({ :type => "hello", :actor => "to-hash" })
-    
+
     actor.say_hello
   end
-  
+
   def test_say_actors
     actor1 = AnimalChat::Actor.new( "socket", "channel" )
     actor2 = AnimalChat::Actor.new( "socket", "channel" )
     actor1.expects(:to_hash).returns( "to-hash1" ).once
     actor2.expects(:to_hash).returns( "to-hash2" ).once
     AnimalChat::Actor.expects(:actors).returns( [actor1, actor2] ).once
-    
+
     actor = AnimalChat::Actor.new( "socket", "channel" )
     actor.expects(:say).with({ :type => "actors", :actors => ["to-hash1", "to-hash2"] })
-    
+
     actor.say_actors
   end
-  
+
   def test_publish_your_self
     actor = AnimalChat::Actor.new( "socket", "channel" )
     actor.stubs(:to_hash).returns( "to-hash" )
     actor.expects(:publish).with({ :type => "actor", :actor => "to-hash" })
-    
+
     actor.publish_your_self
   end
-  
+
   def test_publish
     actor = AnimalChat::Actor.new( "socket", "channel" )
     actor.channel.expects(:push).with( "message" )
-    
+
     actor.publish( "message" )
   end
-  
+
   def test_to_hash
     actor = AnimalChat::Actor.new( "socket", "channel" )
     actor.stubs(:id).returns( "id" )
-    actor.stubs(:color).returns( "color" )    
-    
+    actor.stubs(:color).returns( "color" )
+
     assert_equal( "id", actor.to_hash[:id] )
     assert_equal( "color", actor.to_hash[:color] )
   end
-  
+
 end

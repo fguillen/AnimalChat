@@ -12,7 +12,7 @@ module EventMachine::WebSocket
   end
 end
 
-class ServerTest < Test::Unit::TestCase
+class ServerTest < Minitest::Test
   def setup
     AnimalChat::Logger.stubs( :log )
     @server = AnimalChat::Server.new( "address" )
