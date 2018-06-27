@@ -48,7 +48,7 @@ It is also my first time with [BackBone.js](http://documentcloud.github.com/back
 
 ### Jasmine.js
 
-I have tried to make the JS tests using [Qunit](http://docs.jquery.com/QUnit) which simplicity I love, but the fail error messages were very ambiguous and I had to move all the tests to [Jasmine](http://pivotal.github.com/jasmine/) which I don't like to much the _sugar syntax Rspec style_ but its messages are more helpful.
+I have tried to make the JS tests using [Qunit](http://docs.jquery.com/QUnit) which simplicity I love, but the fail error messages were very ambiguous and I had to move all the tests to [Jasmine](https://jasmine.github.io/) which I don't like to much the _sugar syntax Rspec style_ but its messages are more helpful.
 
 ### Sinon.js
 
