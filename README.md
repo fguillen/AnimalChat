@@ -12,9 +12,6 @@ The result can't be more satisfactory:
 * Good Ruby support in the server side with [EventMachine WebSocket](https://github.com/igrigorik/em-websocket)
 * Very Good performance, with my very poor Internet connection the response is almost immediate.
 
-## Demo
-
-[Animal Chat demo](http://animalchat.fernandoguillen.info)
 
 ## How to play with it in local
 
