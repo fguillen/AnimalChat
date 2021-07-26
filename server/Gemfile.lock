@@ -6,7 +6,7 @@ GEM
       http_parser.rb (~> 0.6.0)
     eventmachine (1.2.3)
     http_parser.rb (0.6.0)
-    json (2.1.0)
+    json (2.3.0)
     metaclass (0.0.4)
     minitest (5.10.2)
     mocha (1.2.1)
