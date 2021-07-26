@@ -1,5 +1,7 @@
 # Animal Chat
 
+![screenshot](https://github.com/fguillen/AnimalChat/blob/master/etc/art/animal_chat.jpg)
+
 **Animal Chat** is a _massive multi user on live web chat_ developed using the _HTML5 WebSocket_ technology.
 
 It is just a programming experiment to taste how the WebSocket technology works, how to implement it and how is its performance.
